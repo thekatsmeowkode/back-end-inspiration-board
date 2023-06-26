@@ -5,15 +5,14 @@ class Card(db.Model):
     message = db.Column(db.String)
     likes_count = db.Column(db.Integer)
     board_id = db.Column(db.Integer, db.ForeignKey('board.board_id', nullable=False))
-    
+    board = db.relationship('Board', back_populates='cards')
     #ON BOARD
-    # cards = db.relationship('Card', back_populates='cards')
+    # cards = db.relationship('Card', back_populates='board')
     
     @classmethod
     def from_dict(cls, card_data):
         new_card = Card(message=card_data["message"],
-                        likes_count=card_data["likes_count"],
-                        board_id=card_data["board_id"])
+                        likes_count=card_data["likes_count"])
         return new_card
     
     def to_dict(self):
