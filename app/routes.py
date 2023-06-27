@@ -1,14 +1,9 @@
 from flask import Blueprint, request, jsonify, make_response, abort
 from app import db
 from app.models.board import Board
-
-# example_bp = Blueprint('example_bp', __name__)
+from app.models.card import Card
 
 board_bp = Blueprint("boards", __name__, url_prefix="/boards")
-from app.models.card import Card
-from app.models.board import Board
-
-# example_bp = Blueprint('example_bp', __name__)
 cards_bp = Blueprint("cards", __name__, url_prefix="/cards")
 
 def validate_model(cls, model_id):
@@ -61,8 +56,7 @@ def create_card(board_id):
     request_body = request.get_json()
     try:
         new_card = Card.from_dict(request_body)
-        # Card.board = board_to_post
-        new_card.board_id = board_to_post.board_id
+        new_card.board = board_to_post
     except:
         return jsonify({'details': 'Invalid card request body data'}), 400
     
