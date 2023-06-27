@@ -6,6 +6,19 @@ from app.models.board import Board
 
 board_bp = Blueprint("boards", __name__, url_prefix="/boards")
 
+def validate_model(cls, model_id):
+    try:
+        model_id = int(model_id)
+    except:
+        abort(make_response({"details":"Invalid data"}, 400))
+
+    model = cls.query.get(model_id)
+    
+    if not model:
+        abort(make_response({"details": f"{cls.__name__} {model_id} is not found"}, 404))
+    
+    return model
+
 
 @board_bp.route("", methods=["POST"])
 def create_board():
@@ -25,7 +38,16 @@ def read_all_boards():
 
     for board in boards:
         boards_response.append(board.to_dict())
+
     return jsonify(boards_response), 200
+
+@board_bp.route("/<id>", methods=["GET"])
+def read_single_board(id):
+    
+    board = validate_model(Board, id)
+
+    return board.to_dict(), 200
+
 
 
 
