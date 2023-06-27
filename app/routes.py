@@ -46,10 +46,10 @@ def read_all_boards():
 
     return jsonify(boards_response), 200
 
-@board_bp.route("/<id>", methods=["GET"])
-def read_single_board(id):
+@board_bp.route("/<board_id>", methods=["GET"])
+def read_single_board(board_id):
     
-    board = validate_model(Board, id)
+    board = validate_model(Board, board_id)
 
     return board.to_dict(), 200
 
@@ -61,14 +61,15 @@ def create_card(board_id):
     request_body = request.get_json()
     try:
         new_card = Card.from_dict(request_body)
-        Card.board = board_to_post
+        # Card.board = board_to_post
+        new_card.board_id = board_to_post.board_id
     except:
         return jsonify({'details': 'Invalid card request body data'}), 400
     
     db.session.add(new_card)
     db.session.commit()
     
-    return jsonify({"task": f"{new_card.to_dict()} successfully created"}), 200
+    return jsonify({"cards": f"{new_card.to_dict()} successfully created"}), 200
 
 ###### DELETE CARD ###############
 @cards_bp.route("/<card_id>", methods=["DELETE"])
