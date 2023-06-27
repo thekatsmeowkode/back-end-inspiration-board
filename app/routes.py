@@ -1,8 +1,7 @@
 from flask import Blueprint, request, jsonify, make_response, abort
 from app import db
 from app.models.card import Card
-import requests
-import os
+from app.models.board import Board
 
 # example_bp = Blueprint('example_bp', __name__)
 cards_bp = Blueprint("cards", __name__, url_prefix="/cards")
@@ -47,7 +46,7 @@ def delete_card(card_id):
     return jsonify({"message": f"{card_to_delete} has been successfully deleted"}), 200
 
 ######## UPDATE CARD TO INCREASE LIKES ################
-@cards_bp.route("/<card_id>", methods=["PUT"])
+@cards_bp.route("/<card_id>/like", methods=["PUT"])
 def update_card(card_id):
     card = validate_model(Card, card_id)
     
