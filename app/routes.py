@@ -108,4 +108,4 @@ def update_card(card_id):
 
     db.session.commit()
 
-    return jsonify({"message": f"Increased like count on card {card.card_id}", "data":card}), 200
+    return jsonify({"message": f"Increased like count on card {card.card_id}", "data":{card}}), 200
