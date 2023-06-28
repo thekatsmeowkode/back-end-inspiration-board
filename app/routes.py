@@ -97,13 +97,14 @@ def delete_card(card_id):
     return jsonify({"message": f"{card_to_delete} has been successfully deleted"}), 200
 
 ######## UPDATE CARD TO INCREASE LIKES ################
-@cards_bp.route("/<card_id>/like", methods=["PUT"])
+@cards_bp.route("/<card_id>/like", methods=["PATCH"])
 def update_card(card_id):
     card = validate_model(Card, card_id)
 
-    request_body = request.get_json()
-
-    card.likes_count = request_body["likes_count"]
+    if not card.likes_count:
+        card.likes_count = 0
+    
+    card.likes_count += 1
 
     db.session.commit()
 
