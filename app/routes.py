@@ -3,6 +3,7 @@ from app import db
 from app.models.board import Board
 from app.models.card import Card
 
+
 board_bp = Blueprint("boards", __name__, url_prefix="/boards")
 cards_bp = Blueprint("cards", __name__, url_prefix="/cards")
 
@@ -51,20 +52,44 @@ def read_single_board(board_id):
     return board.to_dict(), 200
 
 
-####### POST CARD TO A SELECTED BOARD ##########
+####### POST CARD FOR A SELECTED BOARD ##########
+# @board_bp.route("/<board_id>/cards", methods=["POST"])
+# def create_card_of_board(board_id):
+#     board = validate_model(Board, board_id)
+
+#     request_body = request.get_json()
+#     new_card = Card.from_dict(request_body)
+#     new_card.board = board
+
+#     db.session.add(new_card)
+#     db.session.commit()
+
+#     return (new_card.to_dict()), 201
+
 @board_bp.route("/<board_id>/cards", methods=["POST"])
 def create_card_of_board(board_id):
     board = validate_model(Board, board_id)
 
     request_body = request.get_json()
-    new_card = Card.from_dict(request_body)
+    message = request_body.get('message')
+    # message = request.get_json().get('message')
+    
+    if len(message) > 40:
+        return jsonify({'details': 'Please enter a message within 40 characters!'}), 400
+
+    
+    # new_card = Card.from_dict(message=message)
+    # new_card.board = board
+
+    new_card = Card(message=message)
     new_card.board = board
 
     db.session.add(new_card)
     db.session.commit()
 
-    return (new_card.to_dict()), 201
-    # return jsonify({"Cards": f"{new_card.to_dict()} successfully created"}), 201
+    return jsonify(new_card.to_dict()), 201
+
+    
 
 ####### GET ALL CARDS OF A SELECTED BOARD ##########
 @board_bp.route("/<board_id>/cards", methods=["GET"])
