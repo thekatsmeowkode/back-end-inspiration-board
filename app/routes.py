@@ -19,7 +19,7 @@ def validate_model(cls, model_id):
     
     return model
 
-
+####### POST A BOARD ##########
 @board_bp.route("", methods=["POST"])
 def create_board():
     request_body = request.get_json()
@@ -31,6 +31,7 @@ def create_board():
 
     return {"Boards":new_board.to_dict()}, 201
 
+####### GET ALL BOARD ##########
 @board_bp.route("", methods=["GET"])
 def read_all_boards():
     boards = Board.query.all()
@@ -41,6 +42,7 @@ def read_all_boards():
 
     return jsonify(boards_response), 200
 
+####### GET A SINGLE BOARD ##########
 @board_bp.route("/<board_id>", methods=["GET"])
 def read_single_board(board_id):
     
@@ -48,6 +50,34 @@ def read_single_board(board_id):
 
     return board.to_dict(), 200
 
+
+####### POST CARD TO A SELECTED BOARD ##########
+@board_bp.route("/<board_id>/cards", methods=["POST"])
+def create_card_of_board(board_id):
+    board = validate_model(Board, board_id)
+
+    request_body = request.get_json()
+    new_card = Card.from_dict(request_body)
+    new_card.board = board
+
+    db.session.add(new_card)
+    db.session.commit()
+
+    return (new_card.to_dict()), 201
+    # return jsonify({"Cards": f"{new_card.to_dict()} successfully created"}), 201
+
+####### GET ALL CARDS OF A SELECTED BOARD ##########
+@board_bp.route("/<board_id>/cards", methods=["GET"])
+def read_cards_of_board(board_id):
+    board = validate_model(Board, board_id)
+    card_response = []
+
+    for card in board.cards:
+        card_dict = card.to_dict()
+        card_dict["board_id"] = board.board_id
+        card_response.append(card_dict)
+
+    return jsonify(card_response), 200
 
 ####### POST CARD TO SPECIFIC BOARD ##########
 @cards_bp.route("/<board_id>", methods=["POST"])
@@ -63,7 +93,7 @@ def create_card(board_id):
     db.session.add(new_card)
     db.session.commit()
     
-    return jsonify({"cards": f"{new_card.to_dict()} successfully created"}), 200
+    return jsonify({"Cards": f"{new_card.to_dict()} successfully created"}), 200
 
 ###### DELETE CARD ###############
 @cards_bp.route("/<card_id>", methods=["DELETE"])
