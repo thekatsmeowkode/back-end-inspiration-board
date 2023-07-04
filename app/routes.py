@@ -69,7 +69,7 @@ def create_card_of_board(board_id):
     db.session.add(new_card)
     db.session.commit()
 
-    return jsonify({"Cards": f"{new_card.to_dict()} successfully created"}), 201
+    return jsonify({"Cards": new_card.to_dict(), "status": "successfully created"}), 201
 
 
 ####### GET ALL CARDS OF A SELECTED BOARD ##########
