@@ -2,6 +2,9 @@ from flask import Blueprint, request, jsonify, make_response, abort
 from app import db
 from app.models.board import Board
 from app.models.card import Card
+# from werkzeug.utils import secure_filename
+# import os
+
 
 board_bp = Blueprint("boards", __name__, url_prefix="/boards")
 cards_bp = Blueprint("cards", __name__, url_prefix="/cards")
@@ -22,7 +25,7 @@ def validate_model(cls, model_id):
     return model
 
 ####### POST A BOARD ##########
-@board_bp.route("", methods=["POST"])
+@board_bp.route("/boards", methods=["POST"])
 def create_board():
     request_body = request.get_json()
 
@@ -32,6 +35,16 @@ def create_board():
     db.session.commit()
 
     return {"Boards": new_board.to_dict()}, 201
+
+###### DELETE BOARD ###############
+@board_bp.route("/boards/<board_id>", methods=["DELETE"])
+def delete_board(board_id):
+    board_to_delete = validate_model(Board, board_id)
+
+    db.session.delete(board_to_delete)
+    db.session.commit()
+
+    return jsonify({"message": f"Board {board_to_delete.board_id} has been successfully deleted"}), 200
 
 ####### GET ALL BOARD ##########
 @board_bp.route("", methods=["GET"])
@@ -52,7 +65,7 @@ def read_single_board(board_id):
 
     return board.to_dict(), 200
 
-# ####### POST CARD TO SPECIFIC BOARD ##########
+######## POST CARD TO SPECIFIC BOARD ##########
 @board_bp.route("/<board_id>/cards", methods=["POST"])
 def create_card_of_board(board_id):
     board_to_post = validate_model(Board, board_id)
@@ -71,6 +84,12 @@ def create_card_of_board(board_id):
 
     return jsonify({"Cards": new_card.to_dict(), "status": "successfully created"}), 201
 
+######## POST IMAGE ON CARD TO SPECIFIC BOARD ##########
+# @app.route('/endpoint', methods=['POST'])
+# def handle_form():
+#     image = request.files['image']
+#     filename = secure_filename(image.filename)
+#     image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
 ####### GET ALL CARDS OF A SELECTED BOARD ##########
 @board_bp.route("/<board_id>/cards", methods=["GET"])
@@ -84,7 +103,6 @@ def read_cards_of_board(board_id):
         card_response.append(card_dict)
 
     return jsonify(card_response), 200
-
 
 ###### DELETE CARD ###############
 @cards_bp.route("/<card_id>", methods=["DELETE"])
