@@ -99,8 +99,8 @@ def read_cards_of_board(board_id):
 
     for card in board.cards:
         card_dict = card.to_dict()
-        if card_dict["board_id"] == board.board_id:
-            card_response.append(card_dict)
+        card_dict["board_id"] = board.board_id
+        card_response.append(card_dict)
 
     return jsonify(card_response), 200
 
