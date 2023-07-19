@@ -41,6 +41,11 @@ def create_board():
 def delete_board(board_id):
     board_to_delete = validate_model(Board, board_id)
 
+    for card in board_to_delete.cards:
+        if card.board_id == board_id:
+            db.session.delete(card)
+            db.session.commit()
+
     db.session.delete(board_to_delete)
     db.session.commit()
 
